@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>আমার পারসোনাল পোর্টাল</title>
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        background: #eef2f7;
+        margin: 0;
+        padding: 0;
+        text-align: center;
+    }
+
+    header {
+        background: #0077b6;
+        color: white;
+        padding: 30px 0;
+        box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    }
+
+    header img {
+        width: 150px;
+        height: 150px;
+        border-radius: 50%;
+        object-fit: cover;
+        border: 5px solid white;
+    }
+
+    header h1 {
+        margin: 15px 0 0 0;
+        font-size: 26px;
+    }
+
+    section.upload-area {
+        margin: 30px auto;
+        padding: 25px;
+        background: white;
+        max-width: 800px;
+        border-radius: 12px;
+        box-shadow: 0 0 15px rgba(0,0,0,0.1);
+        transition: 0.3s;
+        border: 2px dashed #0077b6;
+        position: relative;
+    }
+
+    section.upload-area.dragover {
+        background: #d0ebff;
+        border-color: #0096c7;
+    }
+
+    section.upload-area input {
+        display: none;
+    }
+
+    .upload-area label {
+        display: inline-block;
+        padding: 10px 20px;
+        background: #0077b6;
+        color: white;
+        font-weight: bold;
+        border-radius: 5px;
+        cursor: pointer;
+        transition: 0.3s;
+    }
+
+    .upload-area label:hover {
+        background: #0096c7;
+    }
+
+    .files-display {
+        margin-top: 25px;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 20px;
+        justify-content: center;
+    }
+
+    .file-item {
+        background: #f9f9f9;
+        border: 1px solid #ccc;
+        padding: 10px;
+        border-radius: 8px;
+        width: 180px;
+        text-align: center;
+        word-wrap: break-word;
+        box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    }
+
+    .file-item img, .file-item video {
+        max-width: 100%;
+        max-height: 120px;
+        margin-bottom: 8px;
+        border-radius: 5px;
+    }
+
+    .file-item a {
+        display: block;
+        margin-top: 5px;
+        color: #0077b6;
+        text-decoration: none;
+        font-weight: bold;
+    }
+
+    .file-item a:hover {
+        text-decoration: underline;
+    }
+</style>
+</head>
+<body>
+
+<header>
+    <img src="images/profile.jpg" alt="Profile Picture">
+    <h1>ইঞ্জিনিয়ার মোঃ আব্দুল মান্নান</h1>
+</header>
+
+<section class="upload-area" id="uploadArea">
+    <h2>ফাইল আপলোড করুন</h2>
+    <p>ড্র্যাগ & ড্রপ অথবা নিচের বাটন ক্লিক করুন</p>
+    <label for="fileInput">ফাইল সিলেক্ট করুন</label>
+    <input type="file" id="fileInput" multiple>
+    <div class="files-display" id="filesDisplay"></div>
+</section>
+
+<script>
+    const fileInput = document.getElementById('fileInput');
+    const filesDisplay = document.getElementById('filesDisplay');
+    const uploadArea = document.getElementById('uploadArea');
+
+    function displayFiles(files) {
+        Array.from(files).forEach(file => {
+            const reader = new FileReader();
+            const fileItem = document.createElement('div');
+            fileItem.className = 'file-item';
+
+            if(file.type.startsWith('image/')){
+                reader.onload = e => {
+                    const img = document.createElement('img');
+                    img.src = e.target.result;
+                    fileItem.appendChild(img);
+
+                    const link = document.createElement('a');
+                    link.href = e.target.result;
+                    link.download = file.name;
+                    link.textContent = 'ডাউনলোড';
+                    fileItem.appendChild(link);
+                }
+                reader.readAsDataURL(file);
+            }
+            else if(file.type.startsWith('video/')){
+                reader.onload = e => {
+                    const video = document.createElement('video');
+                    video.src = e.target.result;
+                    video.controls = true;
+                    fileItem.appendChild(video);
+
+                    const link = document.createElement('a');
+                    link.href = e.target.result;
+                    link.download = file.name;
+                    link.textContent = 'ডাউনলোড';
+                    fileItem.appendChild(link);
+                }
+                reader.readAsDataURL(file);
+            }
+            else {
+                const icon = document.createElement('p');
+                icon.textContent = file.name;
+                fileItem.appendChild(icon);
+
+                reader.onload = e => {
+                    const link = document.createElement('a');
+                    link.href = e.target.result;
+                    link.download = file.name;
+                    link.textContent = 'ডাউনলোড';
+                    fileItem.appendChild(link);
+                }
+                reader.readAsDataURL(file);
+            }
+
+            filesDisplay.appendChild(fileItem);
+        });
+    }
+
+    fileInput.addEventListener('change', (e) => {
+        displayFiles(e.target.files);
+    });
+
+    // Drag & Drop
+    uploadArea.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        uploadArea.classList.add('dragover');
+    });
+
+    uploadArea.addEventListener('dragleave', () => {
+        uploadArea.classList.remove('dragover');
+    });
+
+    uploadArea.addEventListener('drop', (e) => {
+        e.preventDefault();
+        uploadArea.classList.remove('dragover');
+        const files = e.dataTransfer.files;
+        displayFiles(files);
+    });
+</script>
+
+</body>
+</html>
